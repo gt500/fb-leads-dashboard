@@ -1,0 +1,44 @@
+services:
+  # Ad Builder — Express API + React frontend
+  - type: web
+    name: fb-ad-builder
+    runtime: node
+    rootDir: ad-builder-app
+    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: "3001"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: FB_APP_ID
+        sync: false
+      - key: FB_APP_SECRET
+        sync: false
+      - key: FB_REDIRECT_URI
+        sync: false
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: VITE_INTEL_URL
+        sync: false
+    plan: free
+    healthCheckPath: /api/health
+
+  # Intelligence Dashboard — static HTML/JS
+  - type: web
+    name: fb-intel-dashboard
+    runtime: static
+    rootDir: Facebook Lead Ads Intelligence
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: ALLOWALL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

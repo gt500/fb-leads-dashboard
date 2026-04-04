@@ -1,0 +1,7 @@
+node_modules/
+ad-builder-app/node_modules/
+ad-builder-app/dist/
+ad-builder-app/.env
+*.local
+.DS_Store
+Facebook Lead Ads Intelligence.zip

@@ -1,0 +1,11 @@
+/* Global reset — App.css handles all styling */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0A0B0F;
+  color: #E8EAF2;
+  font-family: 'Inter', 'Geist', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { min-height: 100vh; }
