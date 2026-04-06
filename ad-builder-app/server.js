@@ -125,6 +125,7 @@ app.use(express.json());
 // ── Intelligence dashboard — served from main app so /api/ads resolves correctly
 // on Render (one service, one port). The compiled bundle fetches /api/ads relative
 // to its own origin, which now works because all routes are on the same Express app.
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.get('/api/ads',   (_req, res) => res.json(ADS));
 app.get('/api/stats', (_req, res) => res.json(calcStats()));
 app.use('/intel', express.static(INTEL_DIR));
