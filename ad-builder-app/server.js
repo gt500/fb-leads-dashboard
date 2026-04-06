@@ -118,23 +118,31 @@ function calcStats() {
   };
 }
 
-// Intelligence dashboard — served at its own port so its root-based router works correctly
-const intelApp = express();
-
-// Data API must be registered BEFORE static middleware so it takes priority
-intelApp.get('/port/5000/api/ads',   (_req, res) => res.json(ADS));
-intelApp.get('/port/5000/api/stats', (_req, res) => res.json(calcStats()));
-
-intelApp.use(express.static(INTEL_DIR));
-intelApp.use((_req, res) => res.sendFile(resolve(INTEL_DIR, 'index.html')));
-const INTEL_PORT = process.env.INTEL_PORT || 3002;
-intelApp.listen(INTEL_PORT, () =>
-  console.log(`Intelligence Dashboard running on http://localhost:${INTEL_PORT}`)
-);
-
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ── Intelligence dashboard — served from main app so /api/ads resolves correctly
+// on Render (one service, one port). The compiled bundle fetches /api/ads relative
+// to its own origin, which now works because all routes are on the same Express app.
+app.get('/api/ads',   (_req, res) => res.json(ADS));
+app.get('/api/stats', (_req, res) => res.json(calcStats()));
+app.use('/intel', express.static(INTEL_DIR));
+app.get('/intel', (_req, res) => res.sendFile(resolve(INTEL_DIR, 'index.html')));
+app.get('/intel/*', (_req, res) => res.sendFile(resolve(INTEL_DIR, 'index.html')));
+
+// Keep local-dev intelApp on separate port for backward compatibility
+if (process.env.NODE_ENV !== 'production') {
+  const intelApp = express();
+  intelApp.get('/api/ads',   (_req, res) => res.json(ADS));
+  intelApp.get('/api/stats', (_req, res) => res.json(calcStats()));
+  intelApp.use(express.static(INTEL_DIR));
+  intelApp.use((_req, res) => res.sendFile(resolve(INTEL_DIR, 'index.html')));
+  const INTEL_PORT = process.env.INTEL_PORT || 3002;
+  intelApp.listen(INTEL_PORT, () =>
+    console.log(`Intelligence Dashboard (local) running on http://localhost:${INTEL_PORT}`)
+  );
+}
 
 // ── Plan limits (enforced via Supabase tenant record) ────────────────────────
 const PLAN_LIMITS = { starter: 5, growth: 20, pro: Infinity };
